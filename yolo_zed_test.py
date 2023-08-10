@@ -35,16 +35,32 @@ if __name__ == "__main__":
     # Load a YOLOv8 model
     model = YOLO("yolov8s.pt")  # Loading a pretrained model
 
+    """
+    When using the YOLO class, the model is automatically loaded onto the GPU
+    If we were to print the model.device right here, it would say "cpu", but
+    the model will automatically be transferred to the GPU when we perform a forward pass
+    with the model; ex: results = model(image_cv2, verbose=False)
+    If we were to print the model.device right after the forward pass, it would say "cuda:0"
+    This behavior can be seen if we add the line: "print(f"Using {self.device.type} {self.device} for inference.")"
+    to the following file on line 314: 
+    <Installation path to anaconda3>\anaconda3\envs\zed\Lib\site-packages\ultralytics\engine\predictor.py
+    """
+
     # Initialize ZED camera with particular parameters
     zed = sl.Camera()
     init_params = sl.InitParameters()
     init_params.camera_resolution = sl.RESOLUTION.HD720
     init_params.camera_fps = 30
 
-    # Open the camera
+    # Open the camera (if it fails, try re-plugging in the ZED camera)
+    # The ZED camera should show up under "Cameras" in Device Manager
     if not zed.open(init_params) == sl.ERROR_CODE.SUCCESS:
+        print("***********************************")
+        print("Error opening ZED camera. Exiting...")
+        print("***********************************")
         exit(1)
 
+    # Set runtime parameters after opening the camera
     runtime_parameters = sl.RuntimeParameters()
 
     # Create a Mat to store depth data
@@ -80,6 +96,7 @@ if __name__ == "__main__":
 
             # Perform YOLOv8 inference on the ZED image
             results = model(image_cv2, verbose=False)
+            print(f"\tmodel.device: {model.device}")
 
             for r in results:
                 # Create an annotator object
