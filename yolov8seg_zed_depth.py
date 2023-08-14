@@ -135,7 +135,7 @@ if __name__ == "__main__":
                         continue
 
                     # Get the bounding box coordinates
-                    b = box.xyxy[0]
+                    bb_coords = box.xyxy[0]
 
                     # Bounding box pixel locations (x1, y1, x2, y2)
                     bb_locations = box.xyxy[0].tolist()
@@ -161,7 +161,7 @@ if __name__ == "__main__":
                     # Associated label depicts the class and depth measurement of the object
                     # txt_color=(0,0,0) is black text
                     annotator.box_label(
-                        box=b,
+                        box=bb_coords,
                         label=f"Class: {model.names[int(class_label)]} Depth: {depth_measurement_mm:.2f}m",
                         color=colors(class_label, True),
                         txt_color=(255, 255, 255),
